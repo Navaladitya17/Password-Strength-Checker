@@ -1,5 +1,5 @@
 # My Project on Password Strength checker 
-# main.py :-
+# main.py :- 
 import re
 import tkinter as tk
 
