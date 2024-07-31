@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Strength Checker</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #000000;
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        text-align: center;
+        overflow: hidden; /* Prevent scrollbars */
+    }
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    .main-message {
+        font-size: 36px; /* for the main message */
+        color: #ffffff;
+        margin-bottom: 20px; /* Space between the message and container */
+        animation: blink 1s infinite; /* Blinking effect */
+        font-family: 'Verdana', sans-serif;
+    }
+    .container {
+        position: relative;
+        background-color: #ffffff; /* Container background color (white) */
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+    .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+    .weak::before {
+        background-color: rgba(255, 0, 0, 0.2);
+    }
+    .moderate::before {
+        background-color: rgba(255, 255, 0, 0.2);
+    }
+    .strong::before {
+        background-color: rgba(0, 255, 0, 0.2);
+    }
+    .very-strong::before {
+        background-color: rgba(0, 0, 128, 0.2);
+    }
+    h2 {
+        margin-bottom: 20px;
+        color: #000000; /* Heading color (black) */
+        font-size: 24px; /* Increased font size for the heading */
+        position: relative; /* Ensure z-index works correctly */
+    }
+    .message {
+        font-size: 18px; /* For the message */
+        font-weight: bold;
+        margin-bottom: 20px; /* Add some bottom margin for spacing */
+        text-transform: uppercase;
+    }
+    input[type="password"] {
+        width: calc(100% - 40px);
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .result {
+        margin-top: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        transition: color 0.3s, transform 0.3s;
+        position: relative; /* Ensure z-index works correctly */
+    }
+    .result.weak {
+        color: red; /* for weak result */
+    }
+    .result.moderate {
+        color: yellow; /* for moderate result */
+    }
+    .result.strong {
+        color: green; /* for strong result */
+    }
+    .result.very-strong {
+        color: navy; /* for very strong result */
+    }
+    .alert {
+        color: red;
+        font-weight: bold;
+        margin-top: 10px;
+        font-size: 14px;
+        animation: blink 1s infinite;
+        display: none;
+    }
+    @keyframes blink {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-message">HERE YOU CAN CHECK YOUR PASSWORD STRENGTH</div>
+        <div class="container" id="container">
+            <h2>Password Strength Checker</h2>
+            <p class="message">HERE IS YOUR PASSWORD STRENGTH:</p>
+            <input type="password" id="password" placeholder="Enter your password...">
+            <br>
+            <button onclick="checkPassword()">Check</button>
+            <p class="result" id="result"></p>
+            <p class="alert" id="alert">Your password is weak! Please use a stronger password.</p>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            var password = document.getElementById("password").value;
+            var strength = "";
+            var alertElement = document.getElementById("alert");
+
+            // Perform simple Customer (length check)
+            if (password.length < 8) {
+                strength = "Weak";
+                animateResult("weak");
+                showAlert();
+            } else {
+                // Check password complexity
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password) && /[~]/.test(password)) {
+                    strength = "Very Strong";
+                    animateResult("very-strong");
+                    hideAlert();
+                } else if (/[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                    strength = "Strong";
+                    animateResult("strong");
+                    hideAlert();
+                } else if (/[a-zA-Z]/.test(password) && /\d/.test(password)) {
+                    strength = "Moderate";
+                    animateResult("moderate");
+                    hideAlert();
+                } else {
+                    strength = "Weak";
+                    animateResult("weak");
+                    showAlert();
+                }
+            }
+
+            var resultElement = document.getElementById("result");
+            resultElement.textContent = strength;
+            resultElement.className = "result " + strength.toLowerCase().replace(" ", "-");
+
+
+            var container = document.getElementById("container");
+            container.className = "container " + strength.toLowerCase().replace(" ", "-");
+        }
+
+        function showAlert() {
+            var alertElement = document.getElementById("alert");
+            alertElement.style.display = "block";
+        }
+
+        function hideAlert() {
+            var alertElement = document.getElementById("alert");
+            alertElement.style.display = "none";
+        }
+
+        function animateResult(strength) {
+            var resultElement = document.getElementById("result");
+
+            // Reset animation classes
+            resultElement.classList.remove("very-strong", "strong", "moderate", "weak");
+
+            // Trigger reflow to restart animation
+            void resultElement.offsetWidth;
+
+            // Apply animation class
+            resultElement.classList.add(strength);
+        }
+    </script>
+</body>
+</html>
